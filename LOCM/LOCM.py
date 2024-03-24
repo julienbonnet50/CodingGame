@@ -46,12 +46,10 @@ class Board:
         if len(self.cardsOnMyBoard) > 0:
             if len(self.cardsOppositeBoard) < 1:
                 for card in self.cardsOnMyBoard:
-                    print("card attacking face", file=sys.stderr, flush=True)
                     actionForSummon += "ATTACK " + str(card.instanceId) + " -1;"
             elif len(self.cardsOppositeBoard) > 1:
                 for card in self.cardsOnMyBoard:
-                    print("card attacking summon", file=sys.stderr, flush=True)
-                    actionForSummon += "ATTACK " + str(card.instanceId) + " " + str(self.cardsOppositeBoard[random.randint(0, len(self.cardsOppositeBoard))].instanceId)
+                    actionForSummon += "ATTACK " + str(card.instanceId) + " " + str(self.cardsOppositeBoard[random.randint(0, len(self.cardsOppositeBoard))-1].instanceId) + ";"
 
             return actionForSummon
 
@@ -100,13 +98,27 @@ class Card:
         self.opponentHealthChange = opponentHealthChange
         self.cardDraw = cardDraw
 
+        # Abilities
+        self.breakThough = "false"
+        self.charge = "false"
+        self.guard = "false"
+
+
     def __str__(self):
         return (f"CardNumber: {self.cardNumber}, InstanceId: {self.instanceId}, Location: {self.location}, "
                 f"CardType: {self.cardType}, Cost: {self.cost}, Attack: {self.attack}, "
                 f"Defense: {self.defense}, Abilities: {self.abilities}, "
                 f"MyHealthChange: {self.myHealthChange}, OpponentHealthChange: {self.opponentHealthChange}, "
-                f"CardDraw: {self.cardDraw}")
+                f"CardDraw: {self.cardDraw}"
+                f"CardBreakthough: {self.breakThough}, CardCharge: {self.charge}, CardGuard: {self.guard}")
 
+    def giveAbilitiesAttributes(self):
+        if "B" in self.abilities:
+            self.breakThough = "true"
+        elif "G" in self.abilities:
+            self.guard = "true"
+        elif "C" in self.abilities:
+            self.charge = "true"
 
 class Player:
     def __init__(self, health, mana, deck, rune, draw):
@@ -149,6 +161,7 @@ while True:
         card_draw = int(inputs[10])
 
         currentCard = Card(card_number, instance_id, location, card_type, cost, attack, defense, abilities, my_health_change, opponent_health_change, card_draw)
+        currentCard.giveAbilitiesAttributes()
         board.addCard(currentCard)
 
     # Sorting board cards into Hand, myBoard and Opposite board
