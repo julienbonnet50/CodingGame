@@ -43,13 +43,15 @@ class Board:
     def evaluateSummonPlay(self):
         actionForSummon = ""
         # If board contains less than 5 cards
-        if len(self.cardsOnMyBoard) < 5:
-            if len(self.cardsOnMyBoard) > 1 and len(self.cardsOppositeBoard) < 1:
+        if len(self.cardsOnMyBoard) > 0:
+            if len(self.cardsOppositeBoard) < 1:
                 for card in self.cardsOnMyBoard:
-                    actionForSummon = actionForSummon + "ATTACK " + str(card.instanceId) + " -1;"
-            elif len(self.cardsOnMyBoard) > 1 and len(self.cardsOppositeBoard) > 1:
+                    print("card attacking face", file=sys.stderr, flush=True)
+                    actionForSummon += "ATTACK " + str(card.instanceId) + " -1;"
+            elif len(self.cardsOppositeBoard) > 1:
                 for card in self.cardsOnMyBoard:
-                    actionForSummon = actionForSummon + "ATTACK " + str(card.instanceId) + " " + str(self.cardsOppositeBoard[random.randint(0, len(self.cardsOppositeBoard))].instanceId)
+                    print("card attacking summon", file=sys.stderr, flush=True)
+                    actionForSummon += "ATTACK " + str(card.instanceId) + " " + str(self.cardsOppositeBoard[random.randint(0, len(self.cardsOppositeBoard))].instanceId)
 
             return actionForSummon
 
@@ -73,11 +75,16 @@ class Board:
 
     # Main turn function
     def doTurn(self):
+        turnStatements = ""
+
         # Chose a card to summon
-        print(self.printSummon(self.choseCardToSummon(cardToPlay)) + ";" )
+        if len(self.cardsOnMyBoard) < 5:
+            turnStatements += self.printSummon(self.choseCardToSummon(cardToPlay)) + ";"
 
         # For each card in my board
-        print(self.evaluateSummonPlay)
+        turnStatements += self.evaluateSummonPlay()
+
+        return turnStatements
 
 class Card:
     def __init__(self, cardNumber, instanceId, location, cardType, cost, attack, defense, abilities, myHealthChange, opponentHealthChange, cardDraw):
@@ -155,9 +162,10 @@ while True:
     # Write an action using print
     # To debug: print("Debug messages...", file=sys.stderr, flush=True)
 
-        # Phase de Draft
+    # Phase de Draft
     if turnCount < 30:
         # Choix d'une carte aléatoire
+        # TODO : Choisir les meilleures cartes à drafter
         print("PICK " + str(board.evaluateCard()))
 
     else:
@@ -167,7 +175,7 @@ while True:
         print("choseCardToSummon:", board.choseCardToSummon(cardToPlay), file=sys.stderr, flush=True)
         print("Evualate summon to play : " + board.evaluateSummonPlay(),  file=sys.stderr, flush=True)
 
-        board.doTurn()
+        print(board.doTurn())
 
     turnCount += 1
     board = None
