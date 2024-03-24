@@ -5,14 +5,26 @@ import random
 # Auto-generated code below aims at helping you parse
 # the standard input according to the problem statement.
 
-class Hand:
+class Board:
     def __init__(self):
         self.cards = []
+        self.cardsOnMyBoard = []
+        self.cardsOppositeBoard = []
+        self.cardsInHand = []
+
+    def sortCard(self):
+        for card in self.cards:
+            if card.location == 0:
+                self.cardsInHand.append(card)
+            elif card.location == 1:
+                self.cardsOnMyBoard.append(card)
+            elif card.location == -1:
+                self.cardsOppositeBoard.append(card)
 
     def evaluateCardPossibleToPlay(self, mana):
         cardsNumberToPlay = []
-        for card in self.cards:
-            if card.cost <= mana and card.location == 0:
+        for card in self.cardsInHand:
+            if card.cost <= mana:
                 cardsNumberToPlay.append(card.instanceId)
         return cardsNumberToPlay
 
@@ -21,7 +33,7 @@ class Hand:
             return -1
         else :
             return cards[0]
-    
+
     def printSummon(self, int):
         if int < 0 or self.countCardOnBoard() > 5:
             return "PASS"
@@ -29,22 +41,22 @@ class Hand:
             return "SUMMON " + str(int)
 
     def evaluateSummonPlay(self):
-        allySummoned = []
-        ennemieSummoned = []
         actionForSummon = ""
-        for card in self.cards:
-            if card.instanceId == 1:
-                allySummoned.append(card)
-            if card.instanceId == -1:
-                ennemieSummoned.append(card)
-        if len(allySummoned) > 1 and len(ennemieSummoned) < 1:
-            for card in allySummoned:
-                actionForSummon = actionForSummon + "ATTACK " + card.instanceId + " -1;"
-        elif len(allySummoned) > 1 and len(ennemieSummoned) > 1:
-            for card in allySummoned:
-                actionForSummon = actionForSummon + "ATTACK " + card.instanceId + " " + ennemieSummoned[random.randint(0, len(ennemieSummoned))].instanceId
+        # If board contains less than 5 cards
+        if len(self.cardsOnMyBoard) < 5:
+            if len(self.cardsOnMyBoard) > 1 and len(self.cardsOppositeBoard) < 1:
+                for card in self.cardsOnMyBoard:
+                    actionForSummon = actionForSummon + "ATTACK " + str(card.instanceId) + " -1;"
+            elif len(self.cardsOnMyBoard) > 1 and len(self.cardsOppositeBoard) > 1:
+                for card in self.cardsOnMyBoard:
+                    actionForSummon = actionForSummon + "ATTACK " + str(card.instanceId) + " " + str(self.cardsOppositeBoard[random.randint(0, len(self.cardsOppositeBoard))].instanceId)
 
-        return actionForSummon
+            return actionForSummon
+
+        else:
+            # board is Full
+            return ""
+
 
     def countCardOnBoard(self):
         count = 0
@@ -59,6 +71,13 @@ class Hand:
     def addCard(self, cardToAdd):
         self.cards.append(cardToAdd)
 
+    # Main turn function
+    def doTurn(self):
+        # Chose a card to summon
+        print(self.printSummon(self.choseCardToSummon(cardToPlay)) + ";" )
+
+        # For each card in my board
+        print(self.evaluateSummonPlay)
 
 class Card:
     def __init__(self, cardNumber, instanceId, location, cardType, cost, attack, defense, abilities, myHealthChange, opponentHealthChange, cardDraw):
@@ -96,7 +115,7 @@ turnCount = 0
 while True:
     player = Player(0, 0, 0, 0, 0)
     opponent = Player(0, 0, 0, 0, 0)
-    hand = Hand()
+    board = Board()
     for i in range(2):
         player_health, player_mana, player_deck, player_rune, player_draw = [int(j) for j in input().split()]
         if i == 0:
@@ -123,12 +142,13 @@ while True:
         card_draw = int(inputs[10])
 
         currentCard = Card(card_number, instance_id, location, card_type, cost, attack, defense, abilities, my_health_change, opponent_health_change, card_draw)
-        hand.addCard(currentCard)
+        board.addCard(currentCard)
 
-    for i in range(2):
-        print(player, file=sys.stderr, flush = True)
+    # Sorting board cards into Hand, myBoard and Opposite board
+    board.sortCard()
 
-    for card in hand.cards:
+    # Printing all cards on board
+    for card in board.cards:
         print(card, file=sys.stderr, flush=True)
 
 
@@ -138,16 +158,16 @@ while True:
         # Phase de Draft
     if turnCount < 30:
         # Choix d'une carte aléatoire
-        print("PICK " + str(hand.evaluateCard()))
+        print("PICK " + str(board.evaluateCard()))
 
     else:
-        # TODO: Jouer après le draft
-        cardToPlay = hand.evaluateCardPossibleToPlay(player.mana)
+        # Jouer après le draft
+        cardToPlay = board.evaluateCardPossibleToPlay(player.mana)
         print("Card to play:", cardToPlay, "then player mana:", player.mana, file=sys.stderr, flush=True)
-        print("choseCardToSummon:", hand.choseCardToSummon(cardToPlay), file=sys.stderr, flush=True)
-        print(hand.printSummon(hand.choseCardToSummon(cardToPlay)) + ";" )
+        print("choseCardToSummon:", board.choseCardToSummon(cardToPlay), file=sys.stderr, flush=True)
+        print("Evualate summon to play : " + board.evaluateSummonPlay(),  file=sys.stderr, flush=True)
 
-        print("Evualate summon to play : " + hand.evaluateSummonPlay(),  file=sys.stderr, flush=True)
+        board.doTurn()
 
     turnCount += 1
-    hand = None
+    board = None
