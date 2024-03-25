@@ -11,7 +11,6 @@ class Board:
         self.cardsOnMyBoard = []
         self.cardsOppositeBoard = []
         self.cardsInHand = []
-<<<<<<< HEAD
         self.players = []
         self.curve = {0: 0.0, 1: 2.0, 2: 5.0, 3: 8.0, 4: 9.0, 5: 4.0, 6: 1.0, 7: 0.0, 8: 0.0, 9: 1.0, 10: 0.0}
 
@@ -30,24 +29,6 @@ class Board:
                 self.cardsOnMyBoard.append(card)
             elif card.location == -1:
                 self.cardsOppositeBoard.append(card)
-=======
-
-    def sortCard(self):
-        for card in self.cards:
-            if card.location == 0:
-                self.cardsInHand.append(card)
-            elif card.location == 1:
-                self.cardsOnMyBoard.append(card)
-            elif card.location == -1:
-                self.cardsOppositeBoard.append(card)
-
-    def evaluateCardPossibleToPlay(self, mana):
-        cardsNumberToPlay = []
-        for card in self.cardsInHand:
-            if card.cost <= mana:
-                cardsNumberToPlay.append(card.instanceId)
-        return cardsNumberToPlay
->>>>>>> 6c05901dcb3ac4eb71ef5b42113fdb5aa67f4677
 
     def evaluateCardsPossibleToPlay(self):
         cardsToPlay = []
@@ -62,7 +43,6 @@ class Board:
         if len(cardsToPlay) < 1:
             return -1
         else :
-<<<<<<< HEAD
             print("Played Card " + str(cardsToPlay[0].instanceId) + " with cost : " + str(cardsToPlay[0].cost), file=sys.stderr, flush=True)
             self.players[0].mana -= cardsToPlay[0].cost
             self.cardsInHand.remove(cardsToPlay[0])
@@ -70,12 +50,6 @@ class Board:
     
     def printSummon(self, card):
         if card == -1 or self.countCardOnBoard() > 5:
-=======
-            return cards[0]
-
-    def printSummon(self, int):
-        if int < 0 or self.countCardOnBoard() > 5:
->>>>>>> 6c05901dcb3ac4eb71ef5b42113fdb5aa67f4677
             return "PASS"
         else :
             return "SUMMON " + str(card.instanceId)
@@ -89,7 +63,6 @@ class Board:
                     actionForSummon += "ATTACK " + str(card.instanceId) + " -1;"
             elif len(self.cardsOppositeBoard) > 1:
                 for card in self.cardsOnMyBoard:
-<<<<<<< HEAD
                     actionForSummon += "ATTACK " + str(card.instanceId) + " " + str(self.evaluateSummonToAttack(card)) + ";"
 
             return actionForSummon
@@ -130,16 +103,6 @@ class Board:
                 print("Card " + str(mySummonCard.instanceId) + " attack and damage card : " + str(card.instanceId), file=sys.stderr, flush=True)
                 self.cardsOppositeBoard[count].defense -= mySummonCard.attack
             count =+ 1
-=======
-                    actionForSummon += "ATTACK " + str(card.instanceId) + " " + str(self.cardsOppositeBoard[random.randint(0, len(self.cardsOppositeBoard))-1].instanceId) + ";"
-
-            return actionForSummon
-
-        else:
-            # board is Full
-            return ""
-
->>>>>>> 6c05901dcb3ac4eb71ef5b42113fdb5aa67f4677
 
     def countCardOnBoard(self):
         count = 0
@@ -171,7 +134,6 @@ class Board:
     def deleteCard(self, cardToDelete):
         self.cardsOppositeBoard.remove(cardToDelete)
 
-<<<<<<< HEAD
     def checkIfSummonIsCharge(self, cardInstanceId):
         statement = ""
         for card in self.cardsInHand:
@@ -206,19 +168,6 @@ class Board:
         # For each card in my board
         turnStatements += self.evaluateSummonPlay()
         
-=======
-    # Main turn function
-    def doTurn(self):
-        turnStatements = ""
-
-        # Chose a card to summon
-        if len(self.cardsOnMyBoard) < 5:
-            turnStatements += self.printSummon(self.choseCardToSummon(cardToPlay)) + ";"
-
-        # For each card in my board
-        turnStatements += self.evaluateSummonPlay()
-
->>>>>>> 6c05901dcb3ac4eb71ef5b42113fdb5aa67f4677
         return turnStatements
 
 class Card:
@@ -246,13 +195,8 @@ class Card:
                 f"CardType: {self.cardType}, Cost: {self.cost}, Attack: {self.attack}, "
                 f"Defense: {self.defense}, Abilities: {self.abilities}, "
                 f"MyHealthChange: {self.myHealthChange}, OpponentHealthChange: {self.opponentHealthChange}, "
-<<<<<<< HEAD
                 f"CardDraw: {self.cardDraw} "
                 f"CardBreakthough: {self.breakThough}, CardCharge: {self.charge}, CardGuard: {self.guard}")   
-=======
-                f"CardDraw: {self.cardDraw}"
-                f"CardBreakthough: {self.breakThough}, CardCharge: {self.charge}, CardGuard: {self.guard}")
->>>>>>> 6c05901dcb3ac4eb71ef5b42113fdb5aa67f4677
 
     def giveAbilitiesAttributes(self):
         if "B" in self.abilities:
@@ -306,20 +250,12 @@ while True:
         currentCard = Card(card_number, instance_id, location, card_type, cost, attack, defense, abilities, my_health_change, opponent_health_change, card_draw)
         currentCard.giveAbilitiesAttributes()
         board.addCard(currentCard)
-<<<<<<< HEAD
     
     # Sorting board cards into Hand, myBoard and Opposite board
     board.sortCard()
 
     # Printing all cards on board
     print("_________Cards on board : " + str(turnCount) + "____________", file=sys.stderr, flush=True)
-=======
-
-    # Sorting board cards into Hand, myBoard and Opposite board
-    board.sortCard()
-
-    # Printing all cards on board
->>>>>>> 6c05901dcb3ac4eb71ef5b42113fdb5aa67f4677
     for card in board.cards:
         print(card, file=sys.stderr, flush=True)
 
@@ -327,35 +263,20 @@ while True:
     # Write an action using print
     # To debug: print("Debug messages...", file=sys.stderr, flush=True)
 
-    # Phase de Draft
+        # Phase de Draft
     if turnCount < 30:
-<<<<<<< HEAD
         # Choix d'une carte aléatoire 
         # TODO : Choisir les meilleures cartes à drafter
         print("PICK " + str(board.evaluateCard(turnCount)))
-=======
-        # Choix d'une carte aléatoire
-        # TODO : Choisir les meilleures cartes à drafter
-        print("PICK " + str(board.evaluateCard()))
->>>>>>> 6c05901dcb3ac4eb71ef5b42113fdb5aa67f4677
 
         # Jouer après le draft
     else:
-<<<<<<< HEAD
         print("_________Start of turn : " + str(turnCount) + "____________", file=sys.stderr, flush=True)
 
         # print("Card to play:", cardToPlay, "then player mana:", player.mana, file=sys.stderr, flush=True)
         # print("choseCardToSummon:", board.choseCardToSummon(cardToPlay), file=sys.stderr, flush=True)
         # print("Evualate summon to play : " + board.evaluateSummonPlay(),  file=sys.stderr, flush=True)
 
-=======
-        # Jouer après le draft
-        cardToPlay = board.evaluateCardPossibleToPlay(player.mana)
-        print("Card to play:", cardToPlay, "then player mana:", player.mana, file=sys.stderr, flush=True)
-        print("choseCardToSummon:", board.choseCardToSummon(cardToPlay), file=sys.stderr, flush=True)
-        print("Evualate summon to play : " + board.evaluateSummonPlay(),  file=sys.stderr, flush=True)
-
->>>>>>> 6c05901dcb3ac4eb71ef5b42113fdb5aa67f4677
         print(board.doTurn())
 
     turnCount += 1
