@@ -6,50 +6,51 @@ import random
 # the standard input according to the problem statement.
 
 class Board:
+    ### Init phase
     def __init__(self):
         self.cards = []
         self.cardsOnMyBoard = []
         self.cardsOppositeBoard = []
         self.cardsInHand = []
+        self.cardsToPlay = []
         self.players = []
-        self.curve = {0: 0.0, 1: 2.0, 2: 5.0, 3: 8.0, 4: 9.0, 5: 4.0, 6: 1.0, 7: 0.0, 8: 0.0, 9: 1.0, 10: 0.0}
-
+        self.curve = []
 
     def setPlayers(self, player1, player2):
         self.players.append(player1)
         self.players.append(player2)
 
-        # Adjusting real mana
+    ### Related to summon
 
-    def sortCard(self):
-        for card in self.cards:
-            if card.location == 0:
-                self.cardsInHand.append(card)
-            elif card.location == 1:
-                self.cardsOnMyBoard.append(card)
-            elif card.location == -1:
-                self.cardsOppositeBoard.append(card)
+    def checkIfSummonIsCharge(self, cardInstanceId):
+        statement = ""
+        for card in self.cardsInHand:
+            if card.instanceId == cardInstanceId:
+                if card.charge == "true":
+                    statement += "ATTACK " + str(card.instanceId) + " " + str(self.evaluateSummonToAttack(card)) + ";"
+                    return statement
+                else:
+                    return statement
+        return statement
 
     def evaluateCardsPossibleToPlay(self):
-        cardsToPlay = []
         for card in self.cardsInHand:
             if card.cost <= self.players[0].mana:
-                cardsToPlay.append(card)
-        return cardsToPlay
+                self.cardsToPlay.append(card)
 
     # TODO : Better optim for chose card to summon ^^
     def choseCardToSummon(self):
-        cardsToPlay = self.evaluateCardsPossibleToPlay()
-        if len(cardsToPlay) < 1:
+        if len(self.cardsToPlay) < 1:
             return -1
         else :
-            print("Played Card " + str(cardsToPlay[0].instanceId) + " with cost : " + str(cardsToPlay[0].cost), file=sys.stderr, flush=True)
-            self.players[0].mana -= cardsToPlay[0].cost
-            self.cardsInHand.remove(cardsToPlay[0])
-            return cardsToPlay[0]
+            if self.players[0].mana >= self.cardsToPlay[0].cost:
+                print("Playing Card " + str(self.cardsToPlay[0].instanceId) + " with cost : " + str(self.cardsToPlay[0].cost), file=sys.stderr, flush=True)
+                return self.cardsToPlay[0]
+            else: 
+                return ""
     
     def printSummon(self, card):
-        if card == -1 or self.countCardOnBoard() > 5:
+        if card == -1 or self.countCardOnBoard() > 5 or isinstance(card, str):
             return "PASS"
         else :
             return "SUMMON " + str(card.instanceId)
@@ -57,12 +58,14 @@ class Board:
     def evaluateSummonPlay(self):
         actionForSummon = ""
         # If board contains less than 5 cards
+        print("Evluation if its possible to attack. Number of summon ennemies : " + str(len(self.cardsOppositeBoard)), file=sys.stderr, flush=True)
         if len(self.cardsOnMyBoard) > 0:
             if len(self.cardsOppositeBoard) < 1:
                 for card in self.cardsOnMyBoard:
                     actionForSummon += "ATTACK " + str(card.instanceId) + " -1;"
-            elif len(self.cardsOppositeBoard) > 1:
+            elif len(self.cardsOppositeBoard) > 0:
                 for card in self.cardsOnMyBoard:
+                    print("Card " + str(card.instanceId) + " should attack", file=sys.stderr, flush=True)
                     actionForSummon += "ATTACK " + str(card.instanceId) + " " + str(self.evaluateSummonToAttack(card)) + ";"
 
             return actionForSummon
@@ -94,7 +97,7 @@ class Board:
     def battleBoardPreview(self, mySummonCard, ennemiCard):
         if (mySummonCard.attack >= ennemiCard.defense):
             print("Card " + str(mySummonCard.instanceId) + " attack and kill card : " + str(ennemiCard.instanceId), file=sys.stderr, flush=True)
-            self.deleteCard(ennemiCard)
+            self.deleteCard(self.cardsOppositeBoard, ennemiCard)
             return
 
         count = 0
@@ -104,6 +107,29 @@ class Board:
                 self.cardsOppositeBoard[count].defense -= mySummonCard.attack
             count =+ 1
 
+
+
+    ### Draft phase
+    # TODO : Find a better optimisation for draft ^^
+    def evaluateCard(self, turn):
+        if turn < 10:
+            return random.int
+
+
+        for card in self.cards:
+
+
+    ### Related to card 
+
+    def sortCard(self):
+        for card in self.cards:
+            if card.location == 0:
+                self.cardsInHand.append(card)
+            elif card.location == 1:
+                self.cardsOnMyBoard.append(card)
+            elif card.location == -1:
+                self.cardsOppositeBoard.append(card)
+
     def countCardOnBoard(self):
         count = 0
         for card in self.cards:
@@ -111,59 +137,29 @@ class Board:
                 count+=1
         return count
 
-
-    # TODO : Find a better optimisation for draft ^^
-    def evaluateCard(self, turn):
-        def get_weighted_score(card):
-                return weighted_scores[card]
-
-        normalized_curve = {cost: value / sum(self.curve.values()) for cost, value in self.curve.items()}
-        weighted_scores = {card: normalized_curve[card.cost] for card in self.cards}
-
-        # Choose the card with the highest weighted score
-        selected_card = max(weighted_scores, key=get_weighted_score)
-        count = 0
-        for card in self.cards:
-            if card == selected_card:  
-                return count
-            count += 1
-
     def addCard(self, cardToAdd):
         self.cards.append(cardToAdd)
     
-    def deleteCard(self, cardToDelete):
-        self.cardsOppositeBoard.remove(cardToDelete)
-
-    def checkIfSummonIsCharge(self, cardInstanceId):
-        statement = ""
-        for card in self.cardsInHand:
-            if card.instanceId == cardInstanceId:
-                if card.charge == "true":
-                    statement += "ATTACK " + str(card.instanceId) + " " + str(self.evaluateSummonToAttack(card)) + ";"
-                    return statement
-                else:
-                    return statement
-        return statement
-
-    def getLowestCostCardInHand(self):
-        lowestCost = 10
-        for card in self.cardsInHand:
-            if card.cost  < lowestCost:
-                lowestCost = card.cost
-
-        return lowestCost
+    def deleteCard(self, list, cardToDelete):
+        if cardToDelete in list:
+            list.remove(cardToDelete)
 
     # Main turn function
     def doTurn(self):
         turnStatements = ""
-        lowestCostCardInHand = self.getLowestCostCardInHand()
+        self.evaluateCardsPossibleToPlay()
 
         # Chose a card to summon 
-        if len(self.cardsOnMyBoard) < 5:
-            for cardToPlay in self.cardsInHand:
-                if card.cost > lowestCostCardInHand:
-                    print("Card on board " + str(len(self.cardsOnMyBoard)) + " and mana available : " + str(self.players[0].mana) + " vs lowest card in Hard " + str(lowestCostCardInHand),  file=sys.stderr, flush=True)
+        if len(self.cardsOnMyBoard) < 5 and len(self.cardsToPlay) > 0:
+            for cardToEvaluated in self.cardsToPlay:
+                cardToPlay = self.choseCardToSummon()
+                if not isinstance(cardToPlay, str):
+                    print("Mana available before " + str(self.players[0].mana), file=sys.stderr, flush=True)
+                    self.players[0].mana -= self.cardsToPlay[0].cost
+                    print("Mana available after " + str(self.players[0].mana), file=sys.stderr, flush=True)
                     turnStatements += self.printSummon(cardToPlay) + ";" + self.checkIfSummonIsCharge(cardToPlay)
+                    self.deleteCard(self.cardsInHand, cardToPlay)
+                    self.deleteCard(self.cardsToPlay, cardToPlay)
 
         # For each card in my board
         turnStatements += self.evaluateSummonPlay()
