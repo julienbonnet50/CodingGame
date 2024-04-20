@@ -16,6 +16,15 @@ class Board:
         self.players = []
         self.curve = []
 
+        self.curve_values = {
+            1: 5,
+            2: 5,
+            3: 6,
+            4: 5,
+            5: 5,
+            6: 4
+        }
+
     def setPlayers(self, player1, player2):
         self.players.append(player1)
         self.players.append(player2)
@@ -111,14 +120,7 @@ class Board:
 
     ### Draft phase
     def evaluateCard(self, turn):
-        curve = {
-            1: 7,
-            2: 7,
-            3: 6,
-            4: 5,
-            5: 3,
-            6: 2
-        }
+        curve = self.curve_values
         closest_cost = float("inf")
         best_card = None
         for card in self.cards:
