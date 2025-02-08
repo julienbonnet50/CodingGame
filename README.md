@@ -1,7 +1,7 @@
 # Coding game repository
 
-## Legends of code magic 
+Repository of my coding game works
 
-- https://www.codingame.com/ide/puzzle/legends-of-code-magic
+- [LOCM](LOCM/README.md)
 
-  
+- [Clean sea meritis](CleanSea/README.md) 
