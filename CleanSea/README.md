@@ -68,3 +68,9 @@ Il y a 9 jeux de données, identifié par un nombre et un nom.
 Pour valider chaque jeu de données, utiliser le bouton valider correspondant à son numéro.
 
 Le score est la somme de tous les meilleurs scores sur chaque jeu de données.
+
+# Output
+
+Example of output result :
+
+![img_01](./output/plot/01_simple_example-1739181381.png)
