@@ -7,7 +7,7 @@ import numpy as np
 from collections import deque
 import matplotlib.pyplot as plt
 
-
+# Still WIP
 def generate_solution_divided_by_n(M, N, K, ocean_map):
     # Initiate map with empty values
     solution_map = [[' ' for _ in range(N)] for _ in range(M)]
@@ -30,24 +30,24 @@ def generate_solution_divided_by_n(M, N, K, ocean_map):
     # Find trash positions
     trash_positions = [(i, j) for i in range(M) for j in range(N) if ocean_map[i][j] == 'X']
 
-
     return solution_map
 
 
-# filename = "01_simple_example.txt"
-filename = "02_small_sparse.txt"
-# filename = "03_medium.txt"
-# filename = "04_full.txt"
-inputPath, outputPath = getFileNames("C:\\Users\\julie\\Documents\\CodingGame\\CleanSea\\", filename)
+filename = "01_simple_example"
+# filename = "02_small_sparse"
+# filename = "03_medium"
+# filename = "04_full"
+
+inputPath, outputPath = getFileNames("C:\\Users\\julie\\Documents\\CodingGame\\CleanSea\\", filename+".txt")
 
 # filename = r"C:\Users\julie\Documents\CodingGame\CleanSea\data\04_full.txt" 
 posible_bases_favorites = ['N', 'E', 'S', 'W']
 M, N, K, ocean_map = read_map_from_file(inputPath)
 display_ocean_map(M, N, K, ocean_map)
 
-solution_map = generate_solution_divided_by_n(M, N, K, ocean_map)
+solution_map = generate_naive_solution(M, N, K, ocean_map)
 display_ocean_map(M, N, K, solution_map)
 save_map_to_file(solution_map, outputPath)
-plot_maps(ocean_map, solution_map)
+plot_maps(ocean_map, solution_map, filename=filename)
 
 
